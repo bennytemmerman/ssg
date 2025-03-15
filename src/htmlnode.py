@@ -1,3 +1,5 @@
+from textnode import TextType
+
 class HTMLNode:
     def __init__(self, tag=None, value=None, children=None, props=None):
         self.tag = tag
@@ -57,3 +59,30 @@ class ParentNode(HTMLNode):
 
     def __repr__(self):
         return f"ParentNode(tag={self.tag!r}, children={self.children!r}, props={self.props!r})"
+
+def text_node_to_html_node(text_node):
+    """
+    Converts a TextNode into a LeafNode based on the TextType.
+    """
+    if text_node.text_type == TextType.TEXT:
+        return LeafNode(None, text_node.text)
+    
+    elif text_node.text_type == TextType.BOLD:
+        return LeafNode("b", text_node.text)
+    
+    elif text_node.text_type == TextType.ITALIC:
+        return LeafNode("i", text_node.text)
+    
+    elif text_node.text_type == TextType.CODE:
+        return LeafNode("code", text_node.text)
+    
+    elif text_node.text_type == TextType.LINK:
+        # For LINK type, we assume `text_node.text` is the anchor text and the URL is passed as props
+        return LeafNode("a", text_node.text, {"href": text_node.text})
+    
+    elif text_node.text_type == TextType.IMAGE:
+        # For IMAGE type, we assume `text_node.text` contains the image URL and `alt` text
+        return LeafNode("img", "", {"src": text_node.text, "alt": text_node.text})
+    
+    else:
+        raise ValueError(f"Unsupported TextType: {text_node.text_type}")
