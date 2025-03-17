@@ -1,30 +1,31 @@
-from textnode import TextNode, TextType
 import os
 import shutil
+from pathlib import Path
 
-def copy_directory(src, dest):
-    # Ensure destination exists, otherwise create it
-    if os.path.exists(dest):
-        shutil.rmtree(dest)  # Delete existing contents
-    os.makedirs(dest)
-    
-    # Iterate through all files and subdirectories in source
-    for item in os.listdir(src):
-        src_path = os.path.join(src, item)
-        dest_path = os.path.join(dest, item)
-        
-        if os.path.isdir(src_path):
-            copy_directory(src_path, dest_path)  # Recursive call for directories
-        else:
-            shutil.copy(src_path, dest_path)  # Copy files
-            print(f"Copied: {src_path} -> {dest_path}")
+from generate_page import generate_page
+
+PUBLIC_DIR = "public"
+STATIC_DIR = "static"
+CONTENT_DIR = "content"
+
+def clean_public_directory():
+    """Delete everything in the public directory."""
+    if os.path.exists(PUBLIC_DIR):
+        shutil.rmtree(PUBLIC_DIR)
+    os.makedirs(PUBLIC_DIR)
+
+def copy_static_files():
+    """Copy all static files to the public directory."""
+    if os.path.exists(STATIC_DIR):
+        shutil.copytree(STATIC_DIR, os.path.join(PUBLIC_DIR, "static"), dirs_exist_ok=True)
 
 def main():
-    node = TextNode("This is some anchor text", TextType.LINK, "https://www.boot.dev")
-    print(node)
-    src = "static"
-    dest = "public"
-    copy_directory(src, dest)
-    print("Copy completed successfully.")
+    clean_public_directory()
+    copy_static_files()
+    
+    # Generate homepage
+    generate_page(f"{CONTENT_DIR}/index.md", "template.html", f"{PUBLIC_DIR}/index.html")
 
-main()
+if __name__ == "__main__":
+    main()
+
