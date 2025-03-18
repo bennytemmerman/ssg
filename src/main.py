@@ -25,10 +25,37 @@ def copy_static_files():
             else:
                 shutil.copy2(src, dst)  # Copy files
 
+def copy_content_files():
+    """Convert all markdown files from CONTENT_DIR to HTML in PUBLIC_DIR."""
+    if os.path.exists(CONTENT_DIR):
+        for root, dirs, files in os.walk(CONTENT_DIR):
+            # Get relative path from CONTENT_DIR
+            rel_path = os.path.relpath(root, CONTENT_DIR)
+            
+            # Create corresponding directory in PUBLIC_DIR if needed
+            if rel_path != '.':
+                os.makedirs(os.path.join(PUBLIC_DIR, rel_path), exist_ok=True)
+            
+            # Process markdown files
+            for file in files:
+                if file.endswith('.md'):
+                    source_path = os.path.join(root, file)
+                    
+                    # Determine output path, converting .md to .html
+                    output_filename = 'index.html' if file == 'index.md' else file.replace('.md', '.html')
+                    
+                    if rel_path == '.':
+                        output_path = os.path.join(PUBLIC_DIR, output_filename)
+                    else:
+                        output_path = os.path.join(PUBLIC_DIR, rel_path, output_filename)
+                    
+                    # Generate the HTML page
+                    generate_page(source_path, "template.html", output_path)
+
 def main():
     clean_public_directory()
     copy_static_files()
-    
+    copy_content_files()    
     # Generate homepage
     generate_page(f"{CONTENT_DIR}/index.md", "template.html", f"{PUBLIC_DIR}/index.html")
 
