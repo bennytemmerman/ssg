@@ -15,9 +15,15 @@ def clean_public_directory():
     os.makedirs(PUBLIC_DIR)
 
 def copy_static_files():
-    """Copy all static files to the public directory."""
+    """Copy all static files from STATIC_DIR to PUBLIC_DIR without copying the root folder."""
     if os.path.exists(STATIC_DIR):
-        shutil.copytree(STATIC_DIR, os.path.join(PUBLIC_DIR, "static"), dirs_exist_ok=True)
+        for item in os.listdir(STATIC_DIR):  # Iterate over items inside STATIC_DIR
+            src = os.path.join(STATIC_DIR, item)
+            dst = os.path.join(PUBLIC_DIR, item)
+            if os.path.isdir(src):
+                shutil.copytree(src, dst, dirs_exist_ok=True)  # Copy directories
+            else:
+                shutil.copy2(src, dst)  # Copy files
 
 def main():
     clean_public_directory()
