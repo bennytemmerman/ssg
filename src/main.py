@@ -15,7 +15,7 @@ def clean_public_directory():
         shutil.rmtree(PUBLIC_DIR)
     os.makedirs(PUBLIC_DIR)
 
-def copy_static_files():
+def copy_static_files(basepath):
     """Copy all static files from STATIC_DIR to PUBLIC_DIR without copying the root folder."""
     if os.path.exists(STATIC_DIR):
         for item in os.listdir(STATIC_DIR):  # Iterate over items inside STATIC_DIR
@@ -58,7 +58,7 @@ def main():
     basepath = sys.argv[1] if len(sys.argv) > 1 else '/'
     
     clean_public_directory()
-    copy_static_files()
+    copy_static_files(basepath)
     copy_content_files(basepath)
     
     # Generate homepage with basepath
