@@ -1,15 +1,16 @@
 import os
+import sys
 import shutil
 from pathlib import Path
 
 from generate_page import generate_page
 
-PUBLIC_DIR = "public"
+PUBLIC_DIR = "docs"  # Changed from "public" to "docs"
 STATIC_DIR = "static"
 CONTENT_DIR = "content"
 
 def clean_public_directory():
-    """Delete everything in the public directory."""
+    """Delete everything in the docs directory."""
     if os.path.exists(PUBLIC_DIR):
         shutil.rmtree(PUBLIC_DIR)
     os.makedirs(PUBLIC_DIR)
@@ -25,7 +26,7 @@ def copy_static_files():
             else:
                 shutil.copy2(src, dst)  # Copy files
 
-def copy_content_files():
+def copy_content_files(basepath):
     """Convert all markdown files from CONTENT_DIR to HTML in PUBLIC_DIR."""
     if os.path.exists(CONTENT_DIR):
         for root, dirs, files in os.walk(CONTENT_DIR):
@@ -49,15 +50,19 @@ def copy_content_files():
                     else:
                         output_path = os.path.join(PUBLIC_DIR, rel_path, output_filename)
                     
-                    # Generate the HTML page
-                    generate_page(source_path, "template.html", output_path)
+                    # Generate the HTML page with basepath
+                    generate_page(source_path, "template.html", output_path, basepath)
 
 def main():
+    # Get basepath from CLI argument or default to '/'
+    basepath = sys.argv[1] if len(sys.argv) > 1 else '/'
+    
     clean_public_directory()
     copy_static_files()
-    copy_content_files()    
-    # Generate homepage
-    generate_page(f"{CONTENT_DIR}/index.md", "template.html", f"{PUBLIC_DIR}/index.html")
+    copy_content_files(basepath)
+    
+    # Generate homepage with basepath
+    generate_page(f"{CONTENT_DIR}/index.md", "template.html", f"{PUBLIC_DIR}/index.html", basepath)
 
 if __name__ == "__main__":
     main()
