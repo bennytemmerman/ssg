@@ -28,8 +28,8 @@ def generate_page(from_path, template_path, dest_path, basepath):
     os.makedirs(os.path.dirname(dest_path), exist_ok=True)
 
     # Adjust basepath for links
-    page_html = page_html.replace('href="/', f'href="{basepath}')
-    page_html = page_html.replace('src="/', f'src="{basepath}')
+    full_html = full_html.replace('href="/', f'href="{basepath}')
+    full_html = full_html.replace('src="/', f'src="{basepath}')
 
     # Write the final HTML to the destination file
     with open(dest_path, "w", encoding="utf-8") as html_file:
